@@ -23,7 +23,7 @@ private:
     void setupUi();
     void setupSidebar();
     void setupContentArea();
-    
+
     QListWidget *m_menuList;
     QStackedWidget *m_contentStack;
 };

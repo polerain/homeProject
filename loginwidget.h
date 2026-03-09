@@ -26,7 +26,7 @@ private:
     QLineEdit *m_passwordEdit;
     QPushButton *m_loginBtn;
     QPushButton *m_registerBtn;
-    
+
     void setupUi();
 };
 

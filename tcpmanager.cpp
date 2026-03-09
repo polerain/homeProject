@@ -1,9 +1,7 @@
 #include "tcpmanager.h"
 
-TcpManager::TcpManager(QObject *parent) 
-    : QObject(parent)
-    , m_socket(new QTcpSocket(this))
-    , m_isConnected(false)
+TcpManager::TcpManager(QObject *parent)
+    : QObject(parent), m_socket(new QTcpSocket(this)), m_isConnected(false)
 {
     connect(m_socket, &QTcpSocket::readyRead, this, &TcpManager::onReadyRead);
     connect(m_socket, &QTcpSocket::connected, this, &TcpManager::onConnected);
@@ -13,12 +11,13 @@ TcpManager::TcpManager(QObject *parent)
 
 TcpManager::~TcpManager()
 {
-    if (m_socket->isOpen()) {
+    if (m_socket->isOpen())
+    {
         m_socket->close();
     }
 }
 
-TcpManager& TcpManager::instance()
+TcpManager &TcpManager::instance()
 {
     static TcpManager instance;
     return instance;
@@ -27,26 +26,31 @@ TcpManager& TcpManager::instance()
 void TcpManager::connectToDevice(const QString &ip, quint16 port)
 {
     // Check if already connected or connecting
-    if (m_socket->state() == QAbstractSocket::ConnectedState) {
-        if (m_currentIp == ip && m_currentPort == port) {
+    if (m_socket->state() == QAbstractSocket::ConnectedState)
+    {
+        if (m_currentIp == ip && m_currentPort == port)
+        {
             qDebug() << "Already connected to this device.";
             return;
         }
         disconnectFromDevice();
-    } else if (m_socket->state() != QAbstractSocket::UnconnectedState) {
+    }
+    else if (m_socket->state() != QAbstractSocket::UnconnectedState)
+    {
         m_socket->abort(); // Abort current connection attempt
     }
-    
+
     m_currentIp = ip;
     m_currentPort = port;
-    
+
     qDebug() << "Connecting to" << ip << ":" << port;
     m_socket->connectToHost(QHostAddress(ip), port);
 }
 
 void TcpManager::disconnectFromDevice()
 {
-    if (m_socket->isOpen()) {
+    if (m_socket->isOpen())
+    {
         m_socket->disconnectFromHost();
         // Wait briefly or just let the signal handle it
     }
@@ -54,12 +58,13 @@ void TcpManager::disconnectFromDevice()
 
 void TcpManager::sendCommand(const QString &cmd)
 {
-    if (!m_isConnected) {
+    if (!m_isConnected)
+    {
         qDebug() << "Cannot send command: Not connected";
         emit errorOccurred("设备未连接");
         return;
     }
-    
+
     QByteArray data = cmd.toUtf8();
     m_socket->write(data);
     m_socket->flush();

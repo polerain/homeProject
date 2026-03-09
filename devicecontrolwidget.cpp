@@ -52,7 +52,9 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
         m_brightnessSpinBox->setRange(0, 100);
         m_brightnessSpinBox->setValue(80);
         m_brightnessSpinBox->setSuffix("%");
-        m_brightnessSpinBox->setFixedWidth(60);
+        m_brightnessSpinBox->setMinimumWidth(80);
+        m_brightnessSpinBox->setMinimumHeight(30);
+        m_brightnessSpinBox->setStyleSheet("QSpinBox { border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 12px; } QSpinBox::up-button, QSpinBox::down-button { width: 20px; height: 15px; }");
         connect(m_brightnessSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val)
                 {
             // LIGHT_LIVING_BRI_80
@@ -61,7 +63,9 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
         // Color Temp
         m_colorTempCombo = new QComboBox(this);
         m_colorTempCombo->addItems({"暖光", "自然光", "冷白光"});
-        m_colorTempCombo->setFixedWidth(80);
+        m_colorTempCombo->setMinimumWidth(100);
+        m_colorTempCombo->setMinimumHeight(30);
+        m_colorTempCombo->setStyleSheet("QComboBox { border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 12px; } QComboBox::drop-down { width: 20px; } QComboBox::down-arrow { width: 10px; height: 10px; }");
         connect(m_colorTempCombo, &QComboBox::currentTextChanged, [this](const QString &text)
                 {
             // LIGHT_LIVING_COLOR_WARM
@@ -99,7 +103,9 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
         m_tempSpinBox->setRange(16, 30);
         m_tempSpinBox->setValue(26);
         m_tempSpinBox->setSuffix("°C");
-        m_tempSpinBox->setFixedWidth(70);
+        m_tempSpinBox->setMinimumWidth(90);
+        m_tempSpinBox->setMinimumHeight(30);
+        m_tempSpinBox->setStyleSheet("QSpinBox { border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 12px; } QSpinBox::up-button, QSpinBox::down-button { width: 20px; height: 15px; }");
         connect(m_tempSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val)
                 {
             // AC_LIVING_TEMP_26
@@ -108,7 +114,9 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
         // Mode
         m_modeCombo = new QComboBox(this);
         m_modeCombo->addItems({"制冷", "制暖", "送风", "除湿"});
-        m_modeCombo->setFixedWidth(70);
+        m_modeCombo->setMinimumWidth(90);
+        m_modeCombo->setMinimumHeight(30);
+        m_modeCombo->setStyleSheet("QComboBox { border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 12px; } QComboBox::drop-down { width: 20px; } QComboBox::down-arrow { width: 10px; height: 10px; }");
         connect(m_modeCombo, &QComboBox::currentTextChanged, [this](const QString &text)
                 {
             // AC_LIVING_MODE_COOL
@@ -121,7 +129,9 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
         // Fan Speed
         m_fanCombo = new QComboBox(this);
         m_fanCombo->addItems({"自动", "低风", "中风", "高风"});
-        m_fanCombo->setFixedWidth(70);
+        m_fanCombo->setMinimumWidth(90);
+        m_fanCombo->setMinimumHeight(30);
+        m_fanCombo->setStyleSheet("QComboBox { border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 12px; } QComboBox::drop-down { width: 20px; } QComboBox::down-arrow { width: 10px; height: 10px; }");
         connect(m_fanCombo, &QComboBox::currentTextChanged, [this](const QString &text)
                 {
              // AC_LIVING_FAN_AUTO

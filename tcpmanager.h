@@ -11,15 +11,15 @@ class TcpManager : public QObject
 {
     Q_OBJECT
 public:
-    static TcpManager& instance();
-    
+    static TcpManager &instance();
+
     // Connect to a simulated device server
     void connectToDevice(const QString &ip, quint16 port);
     void disconnectFromDevice();
-    
+
     // Send command to device (e.g., "LIGHT_ON", "AC_26")
     void sendCommand(const QString &cmd);
-    
+
     bool isConnected() const;
 
 signals:
@@ -37,8 +37,8 @@ private slots:
 private:
     explicit TcpManager(QObject *parent = nullptr);
     ~TcpManager();
-    TcpManager(const TcpManager&) = delete;
-    TcpManager& operator=(const TcpManager&) = delete;
+    TcpManager(const TcpManager &) = delete;
+    TcpManager &operator=(const TcpManager &) = delete;
 
     QTcpSocket *m_socket;
     QString m_currentIp;

@@ -11,11 +11,14 @@ int main(int argc, char *argv[])
 
     // Load Stylesheet
     QFile file("style.qss");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
         QTextStream stream(&file);
         a.setStyleSheet(stream.readAll());
         file.close();
-    } else {
+    }
+    else
+    {
         qDebug() << "Failed to load style.qss";
     }
 

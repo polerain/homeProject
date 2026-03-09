@@ -11,7 +11,7 @@ class DatabaseManager : public QObject
 {
     Q_OBJECT
 public:
-    static DatabaseManager& instance();
+    static DatabaseManager &instance();
     bool openDatabase();
     void closeDatabase();
     bool initTables(); // Create necessary tables if not exist
@@ -19,8 +19,8 @@ public:
 private:
     explicit DatabaseManager(QObject *parent = nullptr);
     ~DatabaseManager();
-    DatabaseManager(const DatabaseManager&) = delete;
-    DatabaseManager& operator=(const DatabaseManager&) = delete;
+    DatabaseManager(const DatabaseManager &) = delete;
+    DatabaseManager &operator=(const DatabaseManager &) = delete;
 
     QSqlDatabase m_db;
 };

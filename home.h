@@ -7,8 +7,9 @@
 #include "dashboardwidget.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class home;
+namespace Ui
+{
+    class home;
 }
 QT_END_NAMESPACE
 
@@ -22,11 +23,11 @@ public:
 
 private:
     Ui::home *ui;
-    
+
     QStackedWidget *m_mainStack;
     LoginWidget *m_loginWidget;
     DashboardWidget *m_dashboardWidget;
-    
+
     void initUI();
 };
 #endif // HOME_H

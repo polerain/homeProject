@@ -19,7 +19,7 @@ private slots:
 private:
     void setupUi();
     void loadScenes();
-    
+
     QListWidget *m_sceneList;
 };
 
