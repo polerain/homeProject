@@ -21,7 +21,9 @@ SOURCES += \
     tcpmanager.cpp \
     devicecontrolwidget.cpp \
     historywidget.cpp \
-    scenewidget.cpp
+    scenewidget.cpp \
+    aiassistant.cpp \
+    aiassistantwidget.cpp
 
 HEADERS += \
     home.h \
@@ -32,7 +34,9 @@ HEADERS += \
     tcpmanager.h \
     devicecontrolwidget.h \
     historywidget.h \
-    scenewidget.h
+    scenewidget.h \
+    aiassistant.h \
+    aiassistantwidget.h
 
 FORMS += \
     home.ui

@@ -8,6 +8,8 @@ debug/tcpmanager.o
 debug/devicecontrolwidget.o
 debug/historywidget.o
 debug/scenewidget.o
+debug/aiassistant.o
+debug/aiassistantwidget.o
 debug/moc_home.o
 debug/moc_databasemanager.o
 debug/moc_loginwidget.o
@@ -17,3 +19,5 @@ debug/moc_tcpmanager.o
 debug/moc_devicecontrolwidget.o
 debug/moc_historywidget.o
 debug/moc_scenewidget.o
+debug/moc_aiassistant.o
+debug/moc_aiassistantwidget.o

@@ -2,6 +2,7 @@
 #include "devicecontrolwidget.h"
 #include "scenewidget.h"
 #include "historywidget.h"
+#include "aiassistantwidget.h"
 #include "tcpmanager.h"
 
 DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
@@ -51,8 +52,9 @@ void DashboardWidget::setupSidebar()
     m_menuList->addItem("📱 设备控制"); // 1
     m_menuList->addItem("🎬 场景模式"); // 2
     m_menuList->addItem("📊 历史记录"); // 3
-    m_menuList->addItem("⚠️ 异常报警");  // 4
-    m_menuList->addItem("⚙️ 系统设置");  // 5
+    m_menuList->addItem("🤖 AI助手"); // 4
+    m_menuList->addItem("⚠️ 异常报警");  // 5
+    m_menuList->addItem("⚙️ 系统设置");  // 6
 
     // Set Object Name for styling
     m_menuList->setObjectName("sidebar");
@@ -82,12 +84,15 @@ void DashboardWidget::setupContentArea()
     // 3. History Data
     m_contentStack->addWidget(new HistoryWidget(this));
 
-    // 4. Alarm (Placeholder)
+    // 4. AI Assistant
+    m_contentStack->addWidget(new AIAssistantWidget(this));
+
+    // 5. Alarm (Placeholder)
     QLabel *alarmLabel = new QLabel("异常报警模块开发中...", this);
     alarmLabel->setAlignment(Qt::AlignCenter);
     m_contentStack->addWidget(alarmLabel);
 
-    // 5. Settings (Placeholder)
+    // 6. Settings (Placeholder)
     QLabel *settingsLabel = new QLabel("系统设置模块开发中...", this);
     settingsLabel->setAlignment(Qt::AlignCenter);
     m_contentStack->addWidget(settingsLabel);

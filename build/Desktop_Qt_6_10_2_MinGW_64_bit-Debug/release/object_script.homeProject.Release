@@ -8,6 +8,8 @@ release/tcpmanager.o
 release/devicecontrolwidget.o
 release/historywidget.o
 release/scenewidget.o
+release/aiassistant.o
+release/aiassistantwidget.o
 release/moc_home.o
 release/moc_databasemanager.o
 release/moc_loginwidget.o
@@ -17,3 +19,5 @@ release/moc_tcpmanager.o
 release/moc_devicecontrolwidget.o
 release/moc_historywidget.o
 release/moc_scenewidget.o
+release/moc_aiassistant.o
+release/moc_aiassistantwidget.o
