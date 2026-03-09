@@ -1,6 +1,7 @@
 #include "devicecontrolwidget.h"
 #include "tcpmanager.h"
 #include <QMessageBox>
+#include <QStyle>
 
 // --- DeviceItemWidget Implementation ---
 
@@ -15,6 +16,7 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
     m_iconLabel = new QLabel(this);
     m_iconLabel->setFixedSize(50, 50);
     m_iconLabel->setAlignment(Qt::AlignCenter);
+    m_iconLabel->setObjectName("deviceIcon"); // For QSS
     QFont iconFont = m_iconLabel->font();
     iconFont.setPixelSize(24);
     m_iconLabel->setFont(iconFont);
@@ -22,22 +24,58 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
     // Info
     QVBoxLayout *infoLayout = new QVBoxLayout();
     m_nameLabel = new QLabel(name, this);
-    m_nameLabel->setStyleSheet("font-weight: bold; font-size: 16px; color: #333;");
+    m_nameLabel->setObjectName("deviceTitle"); // For QSS
     m_statusLabel = new QLabel(status, this);
-    m_statusLabel->setStyleSheet("font-size: 14px; color: #666;");
+    m_statusLabel->setObjectName("deviceStatus"); // For QSS
     infoLayout->addWidget(m_nameLabel);
     infoLayout->addWidget(m_statusLabel);
 
     // Control Button
     m_controlBtn = new QPushButton(this);
     m_controlBtn->setFixedSize(100, 36);
-    m_controlBtn->setStyleSheet("QPushButton { background-color: #007BFF; color: white; border-radius: 4px; }"
-                                "QPushButton:hover { background-color: #0056b3; }");
+    m_controlBtn->setObjectName("actionButton"); // For QSS
 
     if (type == "LIGHT")
     {
         m_iconLabel->setText("💡");
         m_controlBtn->setText(status == "ON" ? "关闭" : "开启");
+
+        // --- Light Extended Controls ---
+        m_lightControlWidget = new QWidget(this);
+        QHBoxLayout *lightLayout = new QHBoxLayout(m_lightControlWidget);
+        lightLayout->setContentsMargins(0, 0, 0, 0);
+        lightLayout->setSpacing(5);
+
+        // Brightness
+        QLabel *briLabel = new QLabel("亮度:", this);
+        m_brightnessSpinBox = new QSpinBox(this);
+        m_brightnessSpinBox->setRange(0, 100);
+        m_brightnessSpinBox->setValue(80);
+        m_brightnessSpinBox->setSuffix("%");
+        m_brightnessSpinBox->setFixedWidth(60);
+        connect(m_brightnessSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val)
+                {
+            // LIGHT_LIVING_BRI_80
+            emit controlClicked(QString("%1_BRI_%2").arg(m_id.toUpper()).arg(val)); });
+
+        // Color Temp
+        m_colorTempCombo = new QComboBox(this);
+        m_colorTempCombo->addItems({"暖光", "自然光", "冷白光"});
+        m_colorTempCombo->setFixedWidth(80);
+        connect(m_colorTempCombo, &QComboBox::currentTextChanged, [this](const QString &text)
+                {
+            // LIGHT_LIVING_COLOR_WARM
+            QString color = "NATURAL";
+            if(text == "暖光") color = "WARM";
+            else if(text == "冷白光") color = "COLD";
+            emit controlClicked(QString("%1_COLOR_%2").arg(m_id.toUpper()).arg(color)); });
+
+        lightLayout->addWidget(briLabel);
+        lightLayout->addWidget(m_brightnessSpinBox);
+        lightLayout->addWidget(m_colorTempCombo);
+
+        infoLayout->addWidget(m_lightControlWidget);
+
         connect(m_controlBtn, &QPushButton::clicked, [this]()
                 {
             QString cmd = (m_statusLabel->text() == "ON") ? "OFF" : "ON";
@@ -137,9 +175,14 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
 void DeviceItemWidget::setStatus(const QString &status)
 {
     m_statusLabel->setText(status);
-    if (status == "ON" || status == "OPEN" || status == "100") // 100 means open for curtain
+    bool isActive = (status == "ON" || status == "OPEN" || status == "100");
+
+    m_iconLabel->setProperty("active", isActive);
+    style()->unpolish(m_iconLabel);
+    style()->polish(m_iconLabel);
+
+    if (isActive) // 100 means open for curtain
     {
-        m_iconLabel->setStyleSheet("background-color: #4CAF50; border-radius: 25px; color: white;"); // Green
         if (m_type == "LIGHT")
             m_controlBtn->setText("关闭");
         if (m_type == "AC")
@@ -149,7 +192,6 @@ void DeviceItemWidget::setStatus(const QString &status)
     }
     else
     {
-        m_iconLabel->setStyleSheet("background-color: #999; border-radius: 25px; color: white;"); // Gray
         if (m_type == "LIGHT")
             m_controlBtn->setText("开启");
         if (m_type == "AC")
@@ -200,7 +242,7 @@ void DeviceControlWidget::setupUi()
     // Room Selection Bar
     QHBoxLayout *roomLayout = new QHBoxLayout();
     QLabel *roomLabel = new QLabel("选择房间:", this);
-    roomLabel->setStyleSheet("font-weight: bold; font-size: 14px;");
+    roomLabel->setObjectName("sectionHeader"); // QSS
     roomLayout->addWidget(roomLabel);
 
     QStringList rooms = {"全部", "客厅", "卧室", "厨房", "卫生间", "餐厅"};
@@ -209,13 +251,9 @@ void DeviceControlWidget::setupUi()
         QPushButton *btn = new QPushButton(room, this);
         btn->setCheckable(true);
         btn->setAutoExclusive(true);
+        btn->setObjectName("roomButton"); // QSS
         if (room == "全部")
             btn->setChecked(true);
-
-        // Simple styling for toggle buttons
-        btn->setStyleSheet("QPushButton { padding: 8px 15px; border: 1px solid #ccc; border-radius: 4px; background: #f0f0f0; }"
-                           "QPushButton:checked { background-color: #007BFF; color: white; border-color: #0056b3; }"
-                           "QPushButton:hover:!checked { background-color: #e0e0e0; }");
 
         connect(btn, &QPushButton::clicked, [this, room]()
                 { onRoomSelected(room); });
@@ -225,6 +263,7 @@ void DeviceControlWidget::setupUi()
 
     // Device List
     m_deviceList = new QListWidget(this);
+    m_deviceList->setObjectName("deviceList"); // QSS
 
     mainLayout->addLayout(topLayout);
     mainLayout->addLayout(roomLayout); // Add room bar
@@ -273,9 +312,9 @@ void DeviceControlWidget::filterDevices(const QString &room)
         QListWidgetItem *item = new QListWidgetItem(m_deviceList);
 
         // Adjust height based on type
-        if (dev.type == "AC")
+        if (dev.type == "AC" || dev.type == "LIGHT")
         {
-            item->setSizeHint(QSize(0, 120));
+            item->setSizeHint(QSize(0, 120)); // Taller for AC and LIGHT
         }
         else
         {

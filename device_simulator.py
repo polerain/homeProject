@@ -101,6 +101,12 @@ class SmartHomeSimulator:
         elif "AC_" in cmd and "_FAN_" in cmd:
             # AC_LIVING_FAN_AUTO
             return f"{cmd}_OK"
+        elif "LIGHT_" in cmd and "_BRI_" in cmd:
+            # LIGHT_LIVING_BRI_80
+            return f"{cmd}_OK"
+        elif "LIGHT_" in cmd and "_COLOR_" in cmd:
+            # LIGHT_LIVING_COLOR_WARM
+            return f"{cmd}_OK"
         elif cmd == "CURTAIN_LIVING_TOGGLE":
             current_val = int(self.devices.get("curtain_living", "0"))
             # Toggle between 0 and 100

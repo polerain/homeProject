@@ -47,17 +47,15 @@ void DashboardWidget::setupUi()
 void DashboardWidget::setupSidebar()
 {
     m_menuList = new QListWidget(this);
-    m_menuList->addItem("首页总览"); // 0
-    m_menuList->addItem("设备控制"); // 1
-    m_menuList->addItem("场景模式"); // 2
-    m_menuList->addItem("历史记录"); // 3
-    m_menuList->addItem("异常报警"); // 4
-    m_menuList->addItem("系统设置"); // 5
+    m_menuList->addItem("🏠 首页总览"); // 0
+    m_menuList->addItem("📱 设备控制"); // 1
+    m_menuList->addItem("🎬 场景模式"); // 2
+    m_menuList->addItem("📊 历史记录"); // 3
+    m_menuList->addItem("⚠️ 异常报警"); // 4
+    m_menuList->addItem("⚙️ 系统设置"); // 5
     
-    // Simple styling
-    m_menuList->setStyleSheet("QListWidget { background-color: #333; color: white; font-size: 16px; }"
-                              "QListWidget::item { padding: 15px; }"
-                              "QListWidget::item:selected { background-color: #555; }");
+    // Set Object Name for styling
+    m_menuList->setObjectName("sidebar");
     
     // Set default selection
     m_menuList->setCurrentRow(0);

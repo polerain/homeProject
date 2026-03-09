@@ -38,6 +38,11 @@ private:
     QComboBox *m_modeCombo;
     QComboBox *m_fanCombo;
     
+    // Light Specific Controls
+    QWidget *m_lightControlWidget;
+    QSpinBox *m_brightnessSpinBox; // 0-100%
+    QComboBox *m_colorTempCombo;   // Warm, Neutral, Cold
+    
     QString m_name; // Display Name (e.g. 客厅灯)
     QString m_id;   // Internal ID (e.g. light_living)
     QString m_type; // Type (e.g. LIGHT)
