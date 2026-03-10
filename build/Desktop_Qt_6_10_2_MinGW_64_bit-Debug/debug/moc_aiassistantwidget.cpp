@@ -41,27 +41,25 @@ template <> constexpr inline auto AIAssistantWidget::qt_create_metaobjectdata<qt
     namespace QMC = QtMocConstants;
     QtMocHelpers::StringRefStorage qt_stringData {
         "AIAssistantWidget",
-        "onGetSuggestions",
+        "onQueryWeather",
         "",
-        "onSuggestionsReceived",
-        "AIAssistant::WeatherData",
+        "onWeatherReceived",
+        "WeatherManager::WeatherData",
         "weather",
-        "AIAssistant::Suggestions",
-        "suggestions",
-        "onErrorOccurred",
+        "onWeatherErrorOccurred",
         "message"
     };
 
     QtMocHelpers::UintData qt_methods {
-        // Slot 'onGetSuggestions'
+        // Slot 'onQueryWeather'
         QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onSuggestionsReceived'
-        QtMocHelpers::SlotData<void(const AIAssistant::WeatherData &, const AIAssistant::Suggestions &)>(3, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { 0x80000000 | 4, 5 }, { 0x80000000 | 6, 7 },
+        // Slot 'onWeatherReceived'
+        QtMocHelpers::SlotData<void(const WeatherManager::WeatherData &)>(3, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 4, 5 },
         }}),
-        // Slot 'onErrorOccurred'
-        QtMocHelpers::SlotData<void(const QString &)>(8, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::QString, 9 },
+        // Slot 'onWeatherErrorOccurred'
+        QtMocHelpers::SlotData<void(const QString &)>(6, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::QString, 7 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -86,9 +84,9 @@ void AIAssistantWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     auto *_t = static_cast<AIAssistantWidget *>(_o);
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: _t->onGetSuggestions(); break;
-        case 1: _t->onSuggestionsReceived((*reinterpret_cast<std::add_pointer_t<AIAssistant::WeatherData>>(_a[1])),(*reinterpret_cast<std::add_pointer_t<AIAssistant::Suggestions>>(_a[2]))); break;
-        case 2: _t->onErrorOccurred((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
+        case 0: _t->onQueryWeather(); break;
+        case 1: _t->onWeatherReceived((*reinterpret_cast<std::add_pointer_t<WeatherManager::WeatherData>>(_a[1]))); break;
+        case 2: _t->onWeatherErrorOccurred((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }
     }

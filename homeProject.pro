@@ -29,7 +29,8 @@ SOURCES += \
     sceneitemwidget.cpp \
     scenewidget.cpp \
     settingswidget.cpp \
-    tcpmanager.cpp
+    tcpmanager.cpp \
+    weathermanager.cpp
 
 HEADERS += \
     aiassistant.h \
@@ -48,7 +49,8 @@ HEADERS += \
     sceneitemwidget.h \
     scenewidget.h \
     settingswidget.h \
-    tcpmanager.h
+    tcpmanager.h \
+    weathermanager.h
 
 FORMS += \
     home.ui

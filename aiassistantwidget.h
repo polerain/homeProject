@@ -9,7 +9,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
-#include "aiassistant.h"
+#include <QFrame>
+#include "weathermanager.h"
 
 class AIAssistantWidget : public QWidget
 {
@@ -18,24 +19,26 @@ public:
     explicit AIAssistantWidget(QWidget* parent = nullptr);
 
 private slots:
-    void onGetSuggestions();
-    void onSuggestionsReceived(const AIAssistant::WeatherData& weather, const AIAssistant::Suggestions& suggestions);
-    void onErrorOccurred(const QString& message);
+    void onQueryWeather();
+    void onWeatherReceived(const WeatherManager::WeatherData& weather);
+    void onWeatherErrorOccurred(const QString& message);
 
 private:
     void setupUi();
     
     QLineEdit* m_locationEdit;
-    QPushButton* m_getBtn;
+    QPushButton* m_weatherBtn;
     
-    QLabel* m_temperatureLabel;
-    QLabel* m_conditionLabel;
-    QLabel* m_humidityLabel;
-    QLabel* m_windLabel;
+    QLabel* m_weatherConditionLabel;
+    QLabel* m_weatherTemperatureLabel;
+    QLabel* m_weatherHumidityLabel;
+    QLabel* m_weatherWindLabel;
     
-    QLabel* m_clothingLabel;
-    QLabel* m_homeSettingsLabel;
-    QLabel* m_adviceLabel;
+    QLabel* m_weatherClothingLabel;
+    QLabel* m_weatherHomeSettingsLabel;
+    QLabel* m_weatherAdviceLabel;
+    
+    QFrame* m_weatherCard;
 };
 
 #endif // AIASSISTANTWIDGET_H

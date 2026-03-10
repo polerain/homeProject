@@ -16,6 +16,7 @@ release/sceneitemwidget.o
 release/scenewidget.o
 release/settingswidget.o
 release/tcpmanager.o
+release/weathermanager.o
 release/moc_aiassistant.o
 release/moc_aiassistantwidget.o
 release/moc_alarmwidget.o
@@ -33,3 +34,4 @@ release/moc_sceneitemwidget.o
 release/moc_scenewidget.o
 release/moc_settingswidget.o
 release/moc_tcpmanager.o
+release/moc_weathermanager.o

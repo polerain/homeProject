@@ -16,6 +16,7 @@ debug/sceneitemwidget.o
 debug/scenewidget.o
 debug/settingswidget.o
 debug/tcpmanager.o
+debug/weathermanager.o
 debug/moc_aiassistant.o
 debug/moc_aiassistantwidget.o
 debug/moc_alarmwidget.o
@@ -33,3 +34,4 @@ debug/moc_sceneitemwidget.o
 debug/moc_scenewidget.o
 debug/moc_settingswidget.o
 debug/moc_tcpmanager.o
+debug/moc_weathermanager.o

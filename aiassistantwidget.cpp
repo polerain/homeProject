@@ -8,9 +8,8 @@ AIAssistantWidget::AIAssistantWidget(QWidget *parent) : QWidget(parent)
 {
     setupUi();
 
-    // 连接AI助手信号
-    connect(&AIAssistant::instance(), &AIAssistant::suggestionsReceived, this, &AIAssistantWidget::onSuggestionsReceived);
-    connect(&AIAssistant::instance(), &AIAssistant::errorOccurred, this, &AIAssistantWidget::onErrorOccurred);
+    connect(&WeatherManager::instance(), &WeatherManager::weatherReceived, this, &AIAssistantWidget::onWeatherReceived);
+    connect(&WeatherManager::instance(), &WeatherManager::errorOccurred, this, &AIAssistantWidget::onWeatherErrorOccurred);
 }
 
 void AIAssistantWidget::setupUi()
@@ -19,7 +18,7 @@ void AIAssistantWidget::setupUi()
     mainLayout->setContentsMargins(20, 20, 20, 20);
 
     // 标题
-    QLabel *title = new QLabel("🤖 AI 智能助手", this);
+    QLabel *title = new QLabel("🌤️ 天气查询", this);
     title->setAlignment(Qt::AlignCenter);
     QFont titleFont = title->font();
     titleFont.setPointSize(18);
@@ -29,71 +28,76 @@ void AIAssistantWidget::setupUi()
     // 位置输入
     QHBoxLayout *locationLayout = new QHBoxLayout();
     QLabel *locationLabel = new QLabel("城市：", this);
-    m_locationEdit = new QLineEdit("北京", this);
+    m_locationEdit = new QLineEdit("兰州", this);
     m_locationEdit->setFixedWidth(150);
-    m_getBtn = new QPushButton("获取建议", this);
-    m_getBtn->setFixedWidth(100);
+    m_weatherBtn = new QPushButton("查询天气", this);
+    m_weatherBtn->setFixedWidth(100);
 
     locationLayout->addWidget(locationLabel);
     locationLayout->addWidget(m_locationEdit);
     locationLayout->addStretch();
-    locationLayout->addWidget(m_getBtn);
+    locationLayout->addWidget(m_weatherBtn);
 
     // 结果显示区域
-    QGroupBox *resultGroup = new QGroupBox("建议结果", this);
+    QGroupBox *resultGroup = new QGroupBox("天气信息", this);
     QVBoxLayout *resultLayout = new QVBoxLayout(resultGroup);
 
-    // 天气信息
-    QGroupBox *weatherGroup = new QGroupBox("📊 天气信息", this);
-    QVBoxLayout *weatherLayout = new QVBoxLayout(weatherGroup);
+    // 天气信息卡片
+    QFrame *weatherCard = new QFrame();
+    weatherCard->setObjectName("weatherCard");
+    QVBoxLayout *weatherCardLayout = new QVBoxLayout(weatherCard);
+    weatherCardLayout->setContentsMargins(20, 20, 20, 20);
+    weatherCardLayout->setSpacing(15);
 
-    m_temperatureLabel = new QLabel("温度：--", this);
-    m_conditionLabel = new QLabel("天气：--", this);
-    m_humidityLabel = new QLabel("湿度：--", this);
-    m_windLabel = new QLabel("风力：--", this);
+    m_weatherConditionLabel = new QLabel("天气状况：--", this);
+    m_weatherTemperatureLabel = new QLabel("温度：--", this);
+    m_weatherHumidityLabel = new QLabel("湿度：--", this);
+    m_weatherWindLabel = new QLabel("风力：--", this);
 
-    weatherLayout->addWidget(m_temperatureLabel);
-    weatherLayout->addWidget(m_conditionLabel);
-    weatherLayout->addWidget(m_humidityLabel);
-    weatherLayout->addWidget(m_windLabel);
+    m_weatherConditionLabel->setObjectName("weatherLabel");
+    m_weatherTemperatureLabel->setObjectName("weatherLabel");
+    m_weatherHumidityLabel->setObjectName("weatherLabel");
+    m_weatherWindLabel->setObjectName("weatherLabel");
 
-    // 建议信息
-    QGroupBox *suggestionGroup = new QGroupBox("💡 智能建议", this);
-    QVBoxLayout *suggestionLayout = new QVBoxLayout(suggestionGroup);
+    weatherCardLayout->addWidget(m_weatherConditionLabel);
+    weatherCardLayout->addWidget(m_weatherTemperatureLabel);
+    weatherCardLayout->addWidget(m_weatherHumidityLabel);
+    weatherCardLayout->addWidget(m_weatherWindLabel);
 
-    QLabel *clothingTitle = new QLabel("👕 穿衣建议：", this);
-    QFont clothingFont = clothingTitle->font();
-    clothingFont.setBold(true);
-    clothingTitle->setFont(clothingFont);
-    m_clothingLabel = new QLabel("请获取建议...", this);
-    m_clothingLabel->setWordWrap(true);
-    m_clothingLabel->setMinimumHeight(50);
+    QLabel *divider = new QLabel("─────────────────────");
+    divider->setAlignment(Qt::AlignCenter);
+    divider->setObjectName("dividerLabel");
+    weatherCardLayout->addWidget(divider);
 
-    QLabel *homeSettingsTitle = new QLabel("🏠 家居设置：", this);
-    QFont homeSettingsFont = homeSettingsTitle->font();
-    homeSettingsFont.setBold(true);
-    homeSettingsTitle->setFont(homeSettingsFont);
-    m_homeSettingsLabel = new QLabel("请获取建议...", this);
-    m_homeSettingsLabel->setWordWrap(true);
-    m_homeSettingsLabel->setMinimumHeight(50);
+    QLabel *clothingTitle = new QLabel("穿衣建议：", this);
+    clothingTitle->setObjectName("sectionTitle");
+    m_weatherClothingLabel = new QLabel("请查询天气...", this);
+    m_weatherClothingLabel->setObjectName("suggestionLabel");
+    m_weatherClothingLabel->setWordWrap(true);
+    m_weatherClothingLabel->setMinimumHeight(50);
 
-    QLabel *adviceTitle = new QLabel("✨ 综合建议：", this);
-    QFont adviceFont = adviceTitle->font();
-    adviceFont.setBold(true);
-    adviceTitle->setFont(adviceFont);
-    m_adviceLabel = new QLabel("请获取建议...", this);
-    m_adviceLabel->setWordWrap(true);
-    m_adviceLabel->setMinimumHeight(50);
+    QLabel *homeSettingsTitle = new QLabel("家居设置：", this);
+    homeSettingsTitle->setObjectName("sectionTitle");
+    m_weatherHomeSettingsLabel = new QLabel("请查询天气...", this);
+    m_weatherHomeSettingsLabel->setObjectName("suggestionLabel");
+    m_weatherHomeSettingsLabel->setWordWrap(true);
+    m_weatherHomeSettingsLabel->setMinimumHeight(50);
 
-    suggestionLayout->addWidget(clothingTitle);
-    suggestionLayout->addWidget(m_clothingLabel);
-    suggestionLayout->addWidget(homeSettingsTitle);
-    suggestionLayout->addWidget(m_homeSettingsLabel);
-    suggestionLayout->addWidget(adviceTitle);
-    suggestionLayout->addWidget(m_adviceLabel);
+    QLabel *adviceTitle = new QLabel("综合建议：", this);
+    adviceTitle->setObjectName("sectionTitle");
+    m_weatherAdviceLabel = new QLabel("请查询天气...", this);
+    m_weatherAdviceLabel->setObjectName("suggestionLabel");
+    m_weatherAdviceLabel->setWordWrap(true);
+    m_weatherAdviceLabel->setMinimumHeight(50);
 
-    resultLayout->addWidget(weatherGroup);
-    resultLayout->addWidget(suggestionGroup);
+    weatherCardLayout->addWidget(clothingTitle);
+    weatherCardLayout->addWidget(m_weatherClothingLabel);
+    weatherCardLayout->addWidget(homeSettingsTitle);
+    weatherCardLayout->addWidget(m_weatherHomeSettingsLabel);
+    weatherCardLayout->addWidget(adviceTitle);
+    weatherCardLayout->addWidget(m_weatherAdviceLabel);
+
+    resultLayout->addWidget(weatherCard);
 
     // 添加到主布局
     mainLayout->addWidget(title);
@@ -141,71 +145,88 @@ void AIAssistantWidget::setupUi()
         QPushButton:pressed {
             background-color: #3d8b40;
         }
-        QLabel {
-            font-size: 12px;
+        QLabel#weatherLabel {
+            font-size: 14px;
             color: #333;
+            padding: 5px;
+        }
+        QLabel#dividerLabel {
+            color: #ccc;
+            font-size: 12px;
+            padding: 5px 0;
+        }
+        QLabel#sectionTitle {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4CAF50;
+            padding: 5px 0 0 0;
+        }
+        QLabel#suggestionLabel {
+            font-size: 13px;
+            color: #555;
+            padding: 5px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        QFrame#weatherCard {
+            background-color: white;
+            border-radius: 8px;
         }
     )");
 
-    // 刷新界面
-    update();
-
     // 连接按钮点击事件
-    connect(m_getBtn, &QPushButton::clicked, this, &AIAssistantWidget::onGetSuggestions);
+    connect(m_weatherBtn, &QPushButton::clicked, this, &AIAssistantWidget::onQueryWeather);
 }
 
-void AIAssistantWidget::onGetSuggestions()
+void AIAssistantWidget::onQueryWeather()
 {
-    QString location = m_locationEdit->text().trimmed();
-    if (location.isEmpty())
+    QString city = m_locationEdit->text().trimmed();
+    if (city.isEmpty())
     {
         QMessageBox::warning(this, "警告", "请输入城市名称");
         return;
     }
 
-    m_getBtn->setEnabled(false);
-    m_getBtn->setText("正在获取...");
+    m_weatherBtn->setEnabled(false);
+    m_weatherBtn->setText("正在查询...");
 
-    // 获取建议
-    AIAssistant::instance().getHomeSuggestions(location);
+    WeatherManager::instance().queryWeather(city);
 }
 
-void AIAssistantWidget::onSuggestionsReceived(const AIAssistant::WeatherData &weather, const AIAssistant::Suggestions &suggestions)
+void AIAssistantWidget::onWeatherReceived(const WeatherManager::WeatherData &weather)
 {
-    m_temperatureLabel->setText("温度：" + weather.temperature);
-    m_conditionLabel->setText("天气：" + weather.condition);
-    m_humidityLabel->setText("湿度：" + weather.humidity);
-    m_windLabel->setText("风力：" + weather.wind);
+    m_weatherConditionLabel->setText("天气状况：" + weather.condition);
+    m_weatherTemperatureLabel->setText("温度：" + weather.temperature);
+    m_weatherHumidityLabel->setText("湿度：" + weather.humidity);
+    m_weatherWindLabel->setText("风力：" + weather.wind);
+    
+    m_weatherClothingLabel->setText(weather.clothing);
+    m_weatherHomeSettingsLabel->setText(weather.homeSettings);
+    m_weatherAdviceLabel->setText(weather.advice);
 
-    m_clothingLabel->setText(suggestions.clothing);
-    m_homeSettingsLabel->setText(suggestions.homeSettings);
-    m_adviceLabel->setText(suggestions.advice);
+    m_weatherBtn->setEnabled(true);
+    m_weatherBtn->setText("查询天气");
 
-    m_getBtn->setEnabled(true);
-    m_getBtn->setText("获取建议");
-
-    // Log success
     DatabaseManager::LogData log;
     log.timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     log.user = "用户";
-    log.deviceName = "AI助手";
-    log.action = "获取建议: " + m_locationEdit->text();
+    log.deviceName = "天气查询";
+    log.action = "查询天气: " + m_locationEdit->text();
     log.result = "成功";
     DatabaseManager::instance().addLog(log);
 }
 
-void AIAssistantWidget::onErrorOccurred(const QString &message)
+void AIAssistantWidget::onWeatherErrorOccurred(const QString &message)
 {
     QMessageBox::critical(this, "错误", message);
-    m_getBtn->setEnabled(true);
-    m_getBtn->setText("获取建议");
+    m_weatherBtn->setEnabled(true);
+    m_weatherBtn->setText("查询天气");
 
-    // Log error
     DatabaseManager::LogData log;
     log.timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     log.user = "用户";
-    log.deviceName = "AI助手";
-    log.action = "获取建议: " + m_locationEdit->text();
+    log.deviceName = "天气查询";
+    log.action = "查询天气: " + m_locationEdit->text();
     log.result = "失败: " + message;
     DatabaseManager::instance().addLog(log);
 }
