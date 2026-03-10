@@ -105,6 +105,9 @@ void AIAssistantWidget::setupUi()
 
     // 样式
     setStyleSheet(R"(
+        QWidget {
+            background-color: #f5f5f5;
+        }
         QGroupBox {
             border: 2px solid #4CAF50;
             border-radius: 8px;
@@ -112,6 +115,7 @@ void AIAssistantWidget::setupUi()
             padding-top: 10px;
             font-weight: bold;
             color: #4CAF50;
+            background-color: white;
         }
         QGroupBox::title {
             subcontrol-origin: margin;
@@ -122,6 +126,7 @@ void AIAssistantWidget::setupUi()
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            background-color: white;
         }
         QPushButton {
             background-color: #4CAF50;
@@ -138,8 +143,12 @@ void AIAssistantWidget::setupUi()
         }
         QLabel {
             font-size: 12px;
+            color: #333;
         }
     )");
+
+    // 刷新界面
+    update();
 
     // 连接按钮点击事件
     connect(m_getBtn, &QPushButton::clicked, this, &AIAssistantWidget::onGetSuggestions);

@@ -3,7 +3,9 @@
 #include "scenewidget.h"
 #include "historywidget.h"
 #include "aiassistantwidget.h"
+#include "alarmwidget.h"
 #include "tcpmanager.h"
+#include "settingswidget.h"
 
 DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
 {
@@ -24,11 +26,19 @@ DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
                 if(p.startsWith("HUMID=")) humid = p.mid(6).toDouble();
             }
             
-            // Find History Widget and update
-            // Note: History is at index 3 (0-based)
+            // Find History Widget and update (Index 3)
             HistoryWidget *hist = qobject_cast<HistoryWidget*>(m_contentStack->widget(3));
             if(hist) {
                 hist->addDataPoint(temp, humid);
+            }
+            
+            // Find Alarm Widget and check condition (Index 5)
+            AlarmWidget *alarm = qobject_cast<AlarmWidget*>(m_contentStack->widget(5));
+            if(alarm) {
+                qDebug() << "AlarmWidget found, checking conditions:" << temp << humid;
+                alarm->checkAlarmCondition(temp, humid);
+            } else {
+                qDebug() << "AlarmWidget not found!";
             }
         } });
 }
@@ -52,7 +62,7 @@ void DashboardWidget::setupSidebar()
     m_menuList->addItem("📱 设备控制"); // 1
     m_menuList->addItem("🎬 场景模式"); // 2
     m_menuList->addItem("📊 历史记录"); // 3
-    m_menuList->addItem("🤖 AI助手"); // 4
+    m_menuList->addItem("🤖 AI助手");   // 4
     m_menuList->addItem("⚠️ 异常报警");  // 5
     m_menuList->addItem("⚙️ 系统设置");  // 6
 
@@ -87,15 +97,11 @@ void DashboardWidget::setupContentArea()
     // 4. AI Assistant
     m_contentStack->addWidget(new AIAssistantWidget(this));
 
-    // 5. Alarm (Placeholder)
-    QLabel *alarmLabel = new QLabel("异常报警模块开发中...", this);
-    alarmLabel->setAlignment(Qt::AlignCenter);
-    m_contentStack->addWidget(alarmLabel);
+    // 5. Alarm
+    m_contentStack->addWidget(new AlarmWidget(this));
 
-    // 6. Settings (Placeholder)
-    QLabel *settingsLabel = new QLabel("系统设置模块开发中...", this);
-    settingsLabel->setAlignment(Qt::AlignCenter);
-    m_contentStack->addWidget(settingsLabel);
+    // 6. Settings
+    m_contentStack->addWidget(new SettingsWidget(this));
 
     // Connect list selection to stack switch
     connect(m_menuList, &QListWidget::currentRowChanged, m_contentStack, &QStackedWidget::setCurrentIndex);

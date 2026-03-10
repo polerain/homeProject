@@ -76,13 +76,21 @@ bool DatabaseManager::initTables()
                          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                          "name TEXT NOT NULL, "
                          "type TEXT NOT NULL, "
+                         "room TEXT, "
+                         "device_id TEXT UNIQUE, "
                          "status INTEGER DEFAULT 0, "
-                         "params TEXT)"); // params can store JSON or formatted string
+                         "params TEXT)");
     if (!success)
     {
         qDebug() << "Failed to create devices table:" << query.lastError().text();
         return false;
     }
+
+    // Try to add columns if they don't exist (for existing DBs)
+    // SQLite doesn't throw error if column exists with ADD COLUMN? Actually it does.
+    // We can just try and ignore error.
+    query.exec("ALTER TABLE devices ADD COLUMN room TEXT");
+    query.exec("ALTER TABLE devices ADD COLUMN device_id TEXT");
 
     // Create History/Log table
     success = query.exec("CREATE TABLE IF NOT EXISTS logs ("
@@ -139,6 +147,34 @@ bool DatabaseManager::initTables()
         return false;
     }
 
+    // Create Alarms table
+    success = query.exec("CREATE TABLE IF NOT EXISTS alarms ("
+                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                         "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                         "type TEXT, "
+                         "content TEXT, "
+                         "is_read INTEGER DEFAULT 0)");
+    if (!success)
+    {
+        qDebug() << "Failed to create alarms table:" << query.lastError().text();
+        return false;
+    }
+
+    // Create Alarm Settings table (Single row)
+    success = query.exec("CREATE TABLE IF NOT EXISTS alarm_settings ("
+                         "id INTEGER PRIMARY KEY, "
+                         "temp_high REAL DEFAULT 30.0, "
+                         "humid_high REAL DEFAULT 80.0, "
+                         "sound_enabled INTEGER DEFAULT 1)");
+    if (!success)
+    {
+        qDebug() << "Failed to create alarm_settings table:" << query.lastError().text();
+        return false;
+    }
+
+    // Ensure default settings exist
+    query.exec("INSERT OR IGNORE INTO alarm_settings (id, temp_high, humid_high, sound_enabled) VALUES (1, 30.0, 80.0, 1)");
+
     return true;
 }
 
@@ -159,6 +195,193 @@ QList<DatabaseManager::SceneData> DatabaseManager::getAllScenes()
         list.append(d);
     }
     return list;
+}
+
+QList<DatabaseManager::DeviceData> DatabaseManager::getAllDevices()
+{
+    QList<DeviceData> list;
+    if (!m_db.isOpen())
+        return list;
+
+    QSqlQuery query("SELECT id, name, type, room, device_id, status, params FROM devices");
+    while (query.next())
+    {
+        DeviceData d;
+        d.id = query.value(0).toInt();
+        d.name = query.value(1).toString();
+        d.type = query.value(2).toString();
+        d.room = query.value(3).toString();
+        d.deviceId = query.value(4).toString();
+        d.status = query.value(5).toInt();
+        d.params = query.value(6).toString();
+        list.append(d);
+    }
+    return list;
+}
+
+bool DatabaseManager::addDevice(const DeviceData &device)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("INSERT INTO devices (name, type, room, device_id, params) VALUES (?, ?, ?, ?, ?)");
+    query.addBindValue(device.name);
+    query.addBindValue(device.type);
+    query.addBindValue(device.room);
+    query.addBindValue(device.deviceId);
+    query.addBindValue(device.params);
+    return query.exec();
+}
+
+bool DatabaseManager::updateDevice(const DeviceData &device)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("UPDATE devices SET name=?, type=?, room=?, device_id=?, params=? WHERE id=?");
+    query.addBindValue(device.name);
+    query.addBindValue(device.type);
+    query.addBindValue(device.room);
+    query.addBindValue(device.deviceId);
+    query.addBindValue(device.params);
+    query.addBindValue(device.id);
+    return query.exec();
+}
+
+bool DatabaseManager::deleteDevice(int id)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("DELETE FROM devices WHERE id=?");
+    query.addBindValue(id);
+    return query.exec();
+}
+
+bool DatabaseManager::backupDatabase(const QString &destPath)
+{
+    if (!m_db.isOpen())
+        return false;
+    // SQLite backup API is one way, or just copy file.
+    // Since we are using QSqlDatabase, we should close it before copying to be safe, or use SQLite online backup API.
+    // For simplicity in this project, we can just copy the file if it's SQLite.
+    QString dbPath = m_db.databaseName();
+    if (QFile::copy(dbPath, destPath))
+    {
+        return true;
+    }
+    else
+    {
+        // If file exists, try to remove it first
+        if (QFile::exists(destPath))
+        {
+            QFile::remove(destPath);
+            return QFile::copy(dbPath, destPath);
+        }
+        return false;
+    }
+}
+
+bool DatabaseManager::restoreDatabase(const QString &srcPath)
+{
+    if (!QFile::exists(srcPath))
+        return false;
+
+    QString dbPath = m_db.databaseName();
+    closeDatabase(); // Close connection first
+
+    if (QFile::exists(dbPath))
+    {
+        QFile::remove(dbPath);
+    }
+
+    bool success = QFile::copy(srcPath, dbPath);
+
+    openDatabase(); // Reopen
+    return success;
+}
+
+bool DatabaseManager::addAlarm(const QString &type, const QString &content)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("INSERT INTO alarms (type, content) VALUES (?, ?)");
+    query.addBindValue(type);
+    query.addBindValue(content);
+    return query.exec();
+}
+
+QList<DatabaseManager::AlarmData> DatabaseManager::getAlarms(bool onlyUnread)
+{
+    QList<AlarmData> list;
+    if (!m_db.isOpen())
+        return list;
+
+    QString sql = "SELECT id, timestamp, type, content, is_read FROM alarms";
+    if (onlyUnread)
+    {
+        sql += " WHERE is_read = 0";
+    }
+    sql += " ORDER BY timestamp DESC";
+
+    QSqlQuery query(sql);
+    while (query.next())
+    {
+        AlarmData d;
+        d.id = query.value(0).toInt();
+        d.timestamp = query.value(1).toDateTime().toString("yyyy-MM-dd HH:mm:ss");
+        d.type = query.value(2).toString();
+        d.content = query.value(3).toString();
+        d.isRead = query.value(4).toBool();
+        list.append(d);
+    }
+    return list;
+}
+
+bool DatabaseManager::clearAlarms()
+{
+    if (!m_db.isOpen())
+        return false;
+    return QSqlQuery().exec("DELETE FROM alarms");
+}
+
+bool DatabaseManager::markAlarmRead(int id)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("UPDATE alarms SET is_read=1 WHERE id=?");
+    query.addBindValue(id);
+    return query.exec();
+}
+
+void DatabaseManager::saveAlarmSettings(const AlarmSettings &settings)
+{
+    if (!m_db.isOpen())
+        return;
+    QSqlQuery query;
+    query.prepare("UPDATE alarm_settings SET temp_high=?, humid_high=?, sound_enabled=? WHERE id=1");
+    query.addBindValue(settings.tempHighThreshold);
+    query.addBindValue(settings.humidHighThreshold);
+    query.addBindValue(settings.soundEnabled ? 1 : 0);
+    query.exec();
+}
+
+DatabaseManager::AlarmSettings DatabaseManager::getAlarmSettings()
+{
+    AlarmSettings s = {30.0, 80.0, true}; // Defaults
+    if (!m_db.isOpen())
+        return s;
+
+    QSqlQuery query("SELECT temp_high, humid_high, sound_enabled FROM alarm_settings WHERE id=1");
+    if (query.next())
+    {
+        s.tempHighThreshold = query.value(0).toDouble();
+        s.humidHighThreshold = query.value(1).toDouble();
+        s.soundEnabled = query.value(2).toBool();
+    }
+    return s;
 }
 
 bool DatabaseManager::addLog(const LogData &log)
@@ -192,7 +415,8 @@ QList<DatabaseManager::LogData> DatabaseManager::getLogs(const QString &deviceTy
         sql += QString(" AND timestamp <= '%1'").arg(endTime);
     if (!actionType.isEmpty())
         sql += QString(" AND action LIKE '%%1%'").arg(actionType);
-    // if (!deviceType.isEmpty()) ...
+    if (!deviceType.isEmpty())
+        sql += QString(" AND device_name LIKE '%%1%'").arg(deviceType); // Assuming filtering by device name/type string
 
     sql += " ORDER BY timestamp DESC";
 
@@ -441,24 +665,4 @@ DatabaseManager::SceneData DatabaseManager::getScene(int sceneId)
         d.enabled = query.value(3).toBool();
     }
     return d;
-}
-
-QList<DatabaseManager::DeviceData> DatabaseManager::getAllDevices()
-{
-    QList<DeviceData> list;
-    if (!m_db.isOpen())
-        return list;
-
-    QSqlQuery query("SELECT id, name, type, status, params FROM devices");
-    while (query.next())
-    {
-        DeviceData d;
-        d.id = query.value(0).toInt();
-        d.name = query.value(1).toString();
-        d.type = query.value(2).toString();
-        d.status = query.value(3).toInt();
-        d.params = query.value(4).toString();
-        list.append(d);
-    }
-    return list;
 }

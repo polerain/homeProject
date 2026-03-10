@@ -1,6 +1,7 @@
 #include "devicecontrolwidget.h"
 #include "tcpmanager.h"
 #include "databasemanager.h"
+#include "deviceeditdialog.h"
 #include <QMessageBox>
 #include <QStyle>
 #include <QDateTime>
@@ -249,6 +250,17 @@ void DeviceControlWidget::setupUi()
     topLayout->addWidget(m_portEdit);
     topLayout->addWidget(m_connectBtn);
     topLayout->addWidget(refreshBtn);
+
+    QPushButton *addBtn = new QPushButton("添加设备", this);
+    QPushButton *editBtn = new QPushButton("编辑设备", this);
+    QPushButton *deleteBtn = new QPushButton("删除设备", this);
+    QPushButton *testBtn = new QPushButton("测试连接", this);
+
+    topLayout->addWidget(addBtn);
+    topLayout->addWidget(editBtn);
+    topLayout->addWidget(deleteBtn);
+    topLayout->addWidget(testBtn);
+
     topLayout->addStretch();
 
     // Room Selection Bar
@@ -283,26 +295,167 @@ void DeviceControlWidget::setupUi()
 
     connect(m_connectBtn, &QPushButton::clicked, this, &DeviceControlWidget::onConnectClicked);
     connect(refreshBtn, &QPushButton::clicked, this, &DeviceControlWidget::onRefreshClicked);
+
+    connect(addBtn, &QPushButton::clicked, this, &DeviceControlWidget::onAddDeviceClicked);
+    connect(editBtn, &QPushButton::clicked, this, &DeviceControlWidget::onEditDeviceClicked);
+    connect(deleteBtn, &QPushButton::clicked, this, &DeviceControlWidget::onDeleteDeviceClicked);
+    connect(testBtn, &QPushButton::clicked, this, &DeviceControlWidget::onTestDeviceClicked);
 }
 
 void DeviceControlWidget::loadDevices()
 {
-    m_allDevices = {
-        {"客厅主灯", "LIGHT", "OFF", "light_living", "客厅"},
-        {"客厅空调", "AC", "OFF", "ac_living", "客厅"},
-        {"客厅窗帘", "CURTAIN", "CLOSED", "curtain_living", "客厅"},
+    auto dbDevices = DatabaseManager::instance().getAllDevices();
+    m_allDevices.clear();
 
-        {"卧室顶灯", "LIGHT", "OFF", "light_bedroom", "卧室"},
+    // Convert DB data to local struct
+    for (const auto &dbDev : dbDevices)
+    {
+        DeviceInfo info;
+        info.name = dbDev.name;
+        info.type = dbDev.type;
+        info.room = dbDev.room;
+        info.id = dbDev.deviceId;
+        info.status = (dbDev.status == 1 ? "ON" : "OFF"); // Simple mapping
+        m_allDevices.append(info);
+    }
 
-        {"厨房顶灯", "LIGHT", "OFF", "light_kitchen", "厨房"},
-        {"排气扇", "FAN", "OFF", "fan_kitchen", "厨房"}, // Use FAN type icon
+    if (m_allDevices.isEmpty())
+    {
+        // Fallback for initial run if DB is empty
+        m_allDevices = {
+            {"客厅主灯", "LIGHT", "OFF", "light_living", "客厅"},
+            {"客厅空调", "AC", "OFF", "ac_living", "客厅"},
+            {"客厅窗帘", "CURTAIN", "CLOSED", "curtain_living", "客厅"},
+            {"卧室顶灯", "LIGHT", "OFF", "light_bedroom", "卧室"},
+            {"厨房顶灯", "LIGHT", "OFF", "light_kitchen", "厨房"},
+            {"排气扇", "FAN", "OFF", "fan_kitchen", "厨房"},
+            {"卫生间灯", "LIGHT", "OFF", "light_restroom", "卫生间"},
+            {"餐厅吊灯", "LIGHT", "OFF", "light_dining", "餐厅"}};
 
-        {"卫生间灯", "LIGHT", "OFF", "light_restroom", "卫生间"},
-
-        {"餐厅吊灯", "LIGHT", "OFF", "light_dining", "餐厅"}};
+        // Sync to DB
+        for (const auto &info : m_allDevices)
+        {
+            DatabaseManager::DeviceData d;
+            d.name = info.name;
+            d.type = info.type;
+            d.room = info.room;
+            d.deviceId = info.id;
+            d.status = (info.status == "ON" ? 1 : 0);
+            DatabaseManager::instance().addDevice(d);
+        }
+    }
 
     // Initial display: Show all
     filterDevices("全部");
+}
+
+void DeviceControlWidget::onAddDeviceClicked()
+{
+    DeviceEditDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        auto devData = dialog.getDeviceData();
+        if (DatabaseManager::instance().addDevice(devData))
+        {
+            QMessageBox::information(this, "成功", "设备添加成功");
+            loadDevices();
+        }
+        else
+        {
+            QMessageBox::critical(this, "错误", "设备添加失败，ID可能已存在");
+        }
+    }
+}
+
+void DeviceControlWidget::onEditDeviceClicked()
+{
+    QListWidgetItem *item = m_deviceList->currentItem();
+    if (!item)
+    {
+        QMessageBox::warning(this, "提示", "请先在列表中选择一个设备");
+        return;
+    }
+
+    DeviceItemWidget *widget = qobject_cast<DeviceItemWidget *>(m_deviceList->itemWidget(item));
+    if (!widget)
+        return;
+
+    // Find device in DB by ID
+    auto dbDevices = DatabaseManager::instance().getAllDevices();
+    DatabaseManager::DeviceData target;
+    bool found = false;
+    for (const auto &d : dbDevices)
+    {
+        if (d.deviceId == widget->getId())
+        {
+            target = d;
+            found = true;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        DeviceEditDialog dialog(this);
+        dialog.setDeviceData(target);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            if (DatabaseManager::instance().updateDevice(dialog.getDeviceData()))
+            {
+                QMessageBox::information(this, "成功", "设备修改成功");
+                loadDevices();
+            }
+        }
+    }
+}
+
+void DeviceControlWidget::onDeleteDeviceClicked()
+{
+    QListWidgetItem *item = m_deviceList->currentItem();
+    if (!item)
+    {
+        QMessageBox::warning(this, "提示", "请选择要删除的设备");
+        return;
+    }
+
+    DeviceItemWidget *widget = qobject_cast<DeviceItemWidget *>(m_deviceList->itemWidget(item));
+    if (QMessageBox::question(this, "确认", "确定要删除该设备吗？") == QMessageBox::Yes)
+    {
+        // Find ID
+        auto dbDevices = DatabaseManager::instance().getAllDevices();
+        for (const auto &d : dbDevices)
+        {
+            if (d.deviceId == widget->getId())
+            {
+                DatabaseManager::instance().deleteDevice(d.id);
+                break;
+            }
+        }
+        loadDevices();
+    }
+}
+
+void DeviceControlWidget::onTestDeviceClicked()
+{
+    QListWidgetItem *item = m_deviceList->currentItem();
+    if (!item)
+    {
+        QMessageBox::warning(this, "提示", "请选择要测试的设备");
+        return;
+    }
+
+    DeviceItemWidget *widget = qobject_cast<DeviceItemWidget *>(m_deviceList->itemWidget(item));
+    QString id = widget->getId();
+
+    if (!TcpManager::instance().isConnected())
+    {
+        QMessageBox::warning(this, "提示", "请先连接模拟器服务器");
+        return;
+    }
+
+    // Send a test command or just a status request
+    TcpManager::instance().sendCommand("GET_ALL_STATUS");
+    QMessageBox::information(this, "测试", "测试指令已发送，请观察设备状态是否更新");
 }
 
 void DeviceControlWidget::onRoomSelected(const QString &room)

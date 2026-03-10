@@ -47,7 +47,7 @@ void AIAssistant::getHomeSuggestions(const QString &location)
                              "返回JSON格式示例："
                              "{\"temperature\":\"10°C~25°C\",\"condition\":\"晴\",\"humidity\":\"60%\",\"wind\":\"东风3级\",\"clothing\":\"建议穿着短袖\",\"homeSettings\":\"建议开启加湿器\",\"advice\":\"天气不错\"}"
                              "字段说明："
-                             "1. temperature: 气温"
+                             "1. temperature: 气温，一定要查一下当天准确的气温"
                              "2. condition: 天气状况"
                              "3. humidity: 湿度"
                              "4. wind: 风力"

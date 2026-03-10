@@ -136,7 +136,11 @@ template <> constexpr inline auto DeviceControlWidget::qt_create_metaobjectdata<
         "onDeviceControl",
         "cmd",
         "onRoomSelected",
-        "room"
+        "room",
+        "onAddDeviceClicked",
+        "onEditDeviceClicked",
+        "onDeleteDeviceClicked",
+        "onTestDeviceClicked"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -156,6 +160,14 @@ template <> constexpr inline auto DeviceControlWidget::qt_create_metaobjectdata<
         QtMocHelpers::SlotData<void(const QString &)>(8, 2, QMC::AccessPrivate, QMetaType::Void, {{
             { QMetaType::QString, 9 },
         }}),
+        // Slot 'onAddDeviceClicked'
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onEditDeviceClicked'
+        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onDeleteDeviceClicked'
+        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onTestDeviceClicked'
+        QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -184,6 +196,10 @@ void DeviceControlWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
         case 2: _t->onConnectClicked(); break;
         case 3: _t->onDeviceControl((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
         case 4: _t->onRoomSelected((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
+        case 5: _t->onAddDeviceClicked(); break;
+        case 6: _t->onEditDeviceClicked(); break;
+        case 7: _t->onDeleteDeviceClicked(); break;
+        case 8: _t->onTestDeviceClicked(); break;
         default: ;
         }
     }
@@ -208,14 +224,14 @@ int DeviceControlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 9;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 9)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 9;
     }
     return _id;
 }

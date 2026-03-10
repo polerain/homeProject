@@ -152,17 +152,21 @@ class SmartHomeSimulator:
         while self.running:
             try:
                 # Simulate environmental changes
-                self.devices["temp_sensor"] += random.uniform(-0.5, 0.5)
-                self.devices["humid_sensor"] += random.uniform(-1, 1)
+                self.devices["temp_sensor"] += random.uniform(-2.0, 2.0)
+                self.devices["humid_sensor"] += random.uniform(-5.0, 5.0)
                 
                 # Keep within realistic bounds
                 self.devices["temp_sensor"] = max(15, min(35, self.devices["temp_sensor"]))
                 self.devices["humid_sensor"] = max(30, min(90, self.devices["humid_sensor"]))
                 
                 msg = f"ENV_DATA:TEMP={self.devices['temp_sensor']:.1f},HUMID={self.devices['humid_sensor']:.1f}"
-                # client_socket.send(msg.encode('utf-8')) # Optional: Auto-push data
+                try:
+                    client_socket.send(msg.encode('utf-8'))
+                except OSError:
+                    break
                 time.sleep(5) 
-            except:
+            except Exception as e:
+                print(f"Error sending sensor data: {e}")
                 break
 
     def start(self):

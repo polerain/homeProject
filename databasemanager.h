@@ -53,10 +53,43 @@ public:
         int id;
         QString name;
         QString type;
+        QString room; // Added room field
         int status;
         QString params;
+        QString deviceId; // Internal ID like light_living
     };
     QList<DeviceData> getAllDevices();
+    bool addDevice(const DeviceData &device);
+    bool updateDevice(const DeviceData &device);
+    bool deleteDevice(int id);
+
+    // System Settings
+    bool backupDatabase(const QString &destPath);
+    bool restoreDatabase(const QString &srcPath);
+
+    // Alarm Management
+    struct AlarmData
+    {
+        int id;
+        QString timestamp;
+        QString type;
+        QString content;
+        bool isRead;
+    };
+    bool addAlarm(const QString &type, const QString &content);
+    QList<AlarmData> getAlarms(bool onlyUnread = false);
+    bool clearAlarms();
+    bool markAlarmRead(int id);
+
+    // Alarm Settings
+    struct AlarmSettings
+    {
+        double tempHighThreshold;
+        double humidHighThreshold;
+        bool soundEnabled;
+    };
+    void saveAlarmSettings(const AlarmSettings &settings);
+    AlarmSettings getAlarmSettings();
 
     // Log Management
     struct LogData

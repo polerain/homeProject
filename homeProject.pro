@@ -12,37 +12,43 @@ QMAKE_CXXFLAGS += -Wa,-mbig-obj
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    home.cpp \
-    databasemanager.cpp \
-    loginwidget.cpp \
-    dashboardwidget.cpp \
-    qcustomplot.cpp \
-    tcpmanager.cpp \
-    devicecontrolwidget.cpp \
-    historywidget.cpp \
-    scenewidget.cpp \
     aiassistant.cpp \
     aiassistantwidget.cpp \
+    alarmwidget.cpp \
+    dashboardwidget.cpp \
+    databasemanager.cpp \
+    devicecontrolwidget.cpp \
+    deviceeditdialog.cpp \
+    historywidget.cpp \
+    home.cpp \
+    loginwidget.cpp \
+    main.cpp \
+    qcustomplot.cpp \
     sceneeditdialog.cpp \
     sceneexecutor.cpp \
-    sceneitemwidget.cpp
+    sceneitemwidget.cpp \
+    scenewidget.cpp \
+    settingswidget.cpp \
+    tcpmanager.cpp
 
 HEADERS += \
-    home.h \
-    databasemanager.h \
-    loginwidget.h \
-    dashboardwidget.h \
-    qcustomplot.h \
-    tcpmanager.h \
-    devicecontrolwidget.h \
-    historywidget.h \
-    scenewidget.h \
     aiassistant.h \
     aiassistantwidget.h \
+    alarmwidget.h \
+    dashboardwidget.h \
+    databasemanager.h \
+    devicecontrolwidget.h \
+    deviceeditdialog.h \
+    historywidget.h \
+    home.h \
+    loginwidget.h \
+    qcustomplot.h \
     sceneeditdialog.h \
     sceneexecutor.h \
-    sceneitemwidget.h
+    sceneitemwidget.h \
+    scenewidget.h \
+    settingswidget.h \
+    tcpmanager.h
 
 FORMS += \
     home.ui

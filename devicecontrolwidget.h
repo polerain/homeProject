@@ -62,6 +62,10 @@ private slots:
     void onConnectClicked();
     void onDeviceControl(const QString &cmd);
     void onRoomSelected(const QString &room); // New slot for room filtering
+    void onAddDeviceClicked();
+    void onEditDeviceClicked();
+    void onDeleteDeviceClicked();
+    void onTestDeviceClicked();
 
 private:
     void setupUi();
