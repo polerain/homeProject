@@ -14,13 +14,23 @@ public:
     explicit SceneWidget(QWidget *parent = nullptr);
 
 private slots:
-    void onActivateScene(QListWidgetItem *item);
+    void onAddClicked();
+    void onEditClicked();
+    void onDeleteClicked();
+    void onActivateClicked();
+    void onRefreshClicked();
+    void onSceneDoubleClicked(QListWidgetItem *item);
 
 private:
     void setupUi();
     void loadScenes();
 
     QListWidget *m_sceneList;
+    QPushButton *m_btnAdd;
+    QPushButton *m_btnEdit;
+    QPushButton *m_btnDelete;
+    QPushButton *m_btnActivate;
+    QPushButton *m_btnRefresh;
 };
 
 #endif // SCENEWIDGET_H

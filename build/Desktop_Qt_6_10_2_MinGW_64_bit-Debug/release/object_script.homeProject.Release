@@ -10,6 +10,9 @@ release/historywidget.o
 release/scenewidget.o
 release/aiassistant.o
 release/aiassistantwidget.o
+release/sceneeditdialog.o
+release/sceneexecutor.o
+release/sceneitemwidget.o
 release/moc_home.o
 release/moc_databasemanager.o
 release/moc_loginwidget.o
@@ -21,3 +24,6 @@ release/moc_historywidget.o
 release/moc_scenewidget.o
 release/moc_aiassistant.o
 release/moc_aiassistantwidget.o
+release/moc_sceneeditdialog.o
+release/moc_sceneexecutor.o
+release/moc_sceneitemwidget.o
