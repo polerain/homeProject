@@ -23,7 +23,10 @@ SOURCES += \
     historywidget.cpp \
     scenewidget.cpp \
     aiassistant.cpp \
-    aiassistantwidget.cpp
+    aiassistantwidget.cpp \
+    deviceitemwidget.cpp \
+    devicemanager.cpp \
+    sceneeditdialog.cpp
 
 HEADERS += \
     home.h \
@@ -36,7 +39,11 @@ HEADERS += \
     historywidget.h \
     scenewidget.h \
     aiassistant.h \
-    aiassistantwidget.h
+    aiassistantwidget.h \
+    deviceitemwidget.h \
+    devicemanager.h \
+    scenemodels.h \
+    sceneeditdialog.h
 
 FORMS += \
     home.ui
