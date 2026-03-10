@@ -45,7 +45,15 @@ template <> constexpr inline auto HistoryWidget::qt_create_metaobjectdata<qt_met
         "",
         "temp",
         "humidity",
-        "onExportClicked"
+        "onExportClicked",
+        "onQueryLogsClicked",
+        "onQueryEnvClicked",
+        "onClearLogsClicked",
+        "onClearEnvClicked",
+        "onTabChanged",
+        "index",
+        "onDataReceived",
+        "data"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -55,6 +63,22 @@ template <> constexpr inline auto HistoryWidget::qt_create_metaobjectdata<qt_met
         }}),
         // Slot 'onExportClicked'
         QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onQueryLogsClicked'
+        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onQueryEnvClicked'
+        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onClearLogsClicked'
+        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onClearEnvClicked'
+        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onTabChanged'
+        QtMocHelpers::SlotData<void(int)>(10, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 11 },
+        }}),
+        // Slot 'onDataReceived'
+        QtMocHelpers::SlotData<void(const QString &)>(12, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::QString, 13 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -80,6 +104,12 @@ void HistoryWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         switch (_id) {
         case 0: _t->addDataPoint((*reinterpret_cast<std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast<std::add_pointer_t<double>>(_a[2]))); break;
         case 1: _t->onExportClicked(); break;
+        case 2: _t->onQueryLogsClicked(); break;
+        case 3: _t->onQueryEnvClicked(); break;
+        case 4: _t->onClearLogsClicked(); break;
+        case 5: _t->onClearEnvClicked(); break;
+        case 6: _t->onTabChanged((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
+        case 7: _t->onDataReceived((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }
     }
@@ -104,14 +134,14 @@ int HistoryWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 2)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 2;
+        _id -= 8;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 2)
+        if (_id < 8)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 2;
+        _id -= 8;
     }
     return _id;
 }

@@ -2,6 +2,8 @@ import socket
 import threading
 import time
 import random
+import json
+from datetime import datetime, timedelta
 
 # Configuration
 HOST = '127.0.0.1'
@@ -119,6 +121,30 @@ class SmartHomeSimulator:
             for k, v in self.devices.items():
                 status.append(f"{k}:{v}")
             return ",".join(status)
+        elif cmd == "GET_HISTORY_ENV_DATA":
+            # Simulate last 7 days of data, one point per hour
+            history_data = []
+            now = datetime.now()
+            # Start from 7 days ago
+            start_time = now - timedelta(days=7)
+            
+            current_time = start_time
+            while current_time <= now:
+                # Simulate some daily cycle for temp
+                hour = current_time.hour
+                base_temp = 20 + 5 * (1 - abs(hour - 14) / 12) # Peak at 14:00
+                temp = base_temp + random.uniform(-1, 1)
+                humid = 50 + random.uniform(-10, 10)
+                
+                history_data.append({
+                    "timestamp": current_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "temperature": round(temp, 1),
+                    "humidity": round(humid, 1)
+                })
+                current_time += timedelta(hours=4) # Every 4 hours to keep payload reasonable
+            
+            json_str = json.dumps(history_data)
+            return f"HISTORY_ENV_DATA:{json_str}"
             
         return "UNKNOWN_CMD"
 

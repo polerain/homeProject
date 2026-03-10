@@ -126,6 +126,19 @@ bool DatabaseManager::initTables()
         return false;
     }
 
+    // Create Environment Data table
+    success = query.exec("CREATE TABLE IF NOT EXISTS env_data ("
+                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                         "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                         "temperature REAL, "
+                         "humidity REAL, "
+                         "air_quality REAL DEFAULT 0)");
+    if (!success)
+    {
+        qDebug() << "Failed to create env_data table:" << query.lastError().text();
+        return false;
+    }
+
     return true;
 }
 
@@ -146,6 +159,109 @@ QList<DatabaseManager::SceneData> DatabaseManager::getAllScenes()
         list.append(d);
     }
     return list;
+}
+
+bool DatabaseManager::addLog(const LogData &log)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("INSERT INTO logs (user, device_name, action, result) VALUES (?, ?, ?, ?)");
+    query.addBindValue(log.user);
+    query.addBindValue(log.deviceName);
+    query.addBindValue(log.action);
+    query.addBindValue(log.result);
+    return query.exec();
+}
+
+QList<DatabaseManager::LogData> DatabaseManager::getLogs(const QString &deviceType, const QString &startTime, const QString &endTime, const QString &actionType)
+{
+    QList<LogData> list;
+    if (!m_db.isOpen())
+        return list;
+
+    QString sql = "SELECT id, timestamp, user, device_name, action, result FROM logs WHERE 1=1";
+
+    // Note: To filter by device type, we might need a join or store type in logs.
+    // For now, assuming device_name contains type or we filter by device name if deviceType provided.
+    // Or let's assume deviceType is passed as empty if not filtering.
+
+    if (!startTime.isEmpty())
+        sql += QString(" AND timestamp >= '%1'").arg(startTime);
+    if (!endTime.isEmpty())
+        sql += QString(" AND timestamp <= '%1'").arg(endTime);
+    if (!actionType.isEmpty())
+        sql += QString(" AND action LIKE '%%1%'").arg(actionType);
+    // if (!deviceType.isEmpty()) ...
+
+    sql += " ORDER BY timestamp DESC";
+
+    QSqlQuery query(sql);
+    while (query.next())
+    {
+        LogData d;
+        d.id = query.value(0).toInt();
+        d.timestamp = query.value(1).toDateTime().toString("yyyy-MM-dd HH:mm:ss");
+        d.user = query.value(2).toString();
+        d.deviceName = query.value(3).toString();
+        d.action = query.value(4).toString();
+        d.result = query.value(5).toString();
+        list.append(d);
+    }
+    return list;
+}
+
+bool DatabaseManager::clearLogs()
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    return query.exec("DELETE FROM logs");
+}
+
+bool DatabaseManager::addEnvData(double temp, double humidity)
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    query.prepare("INSERT INTO env_data (temperature, humidity) VALUES (?, ?)");
+    query.addBindValue(temp);
+    query.addBindValue(humidity);
+    return query.exec();
+}
+
+QList<DatabaseManager::EnvData> DatabaseManager::getEnvData(const QString &startTime, const QString &endTime)
+{
+    QList<EnvData> list;
+    if (!m_db.isOpen())
+        return list;
+
+    QString sql = "SELECT id, timestamp, temperature, humidity FROM env_data WHERE 1=1";
+    if (!startTime.isEmpty())
+        sql += QString(" AND timestamp >= '%1'").arg(startTime);
+    if (!endTime.isEmpty())
+        sql += QString(" AND timestamp <= '%1'").arg(endTime);
+    sql += " ORDER BY timestamp ASC"; // ASC for charting
+
+    QSqlQuery query(sql);
+    while (query.next())
+    {
+        EnvData d;
+        d.id = query.value(0).toInt();
+        d.timestamp = query.value(1).toDateTime().toString("yyyy-MM-dd HH:mm:ss");
+        d.temperature = query.value(2).toDouble();
+        d.humidity = query.value(3).toDouble();
+        list.append(d);
+    }
+    return list;
+}
+
+bool DatabaseManager::clearEnvData()
+{
+    if (!m_db.isOpen())
+        return false;
+    QSqlQuery query;
+    return query.exec("DELETE FROM env_data");
 }
 
 QList<DatabaseManager::SceneDeviceBinding> DatabaseManager::getSceneBindings(int sceneId)

@@ -1,7 +1,9 @@
 #include "devicecontrolwidget.h"
 #include "tcpmanager.h"
+#include "databasemanager.h"
 #include <QMessageBox>
 #include <QStyle>
+#include <QDateTime>
 
 // --- DeviceItemWidget Implementation ---
 
@@ -366,6 +368,37 @@ void DeviceControlWidget::onRefreshClicked()
 void DeviceControlWidget::onDeviceControl(const QString &cmd)
 {
     TcpManager::instance().sendCommand(cmd);
+
+    // 记录操作日志
+    QString deviceName = "未知设备";
+    QString action = cmd;
+    QString result = "指令已发送";
+
+    // 尝试匹配设备名称
+    // 遍历所有设备，检查命令是否以设备ID开头（忽略大小写）
+    for (const auto &dev : m_allDevices)
+    {
+        if (cmd.startsWith(dev.id.toUpper()))
+        {
+            deviceName = dev.name;
+            // 提取动作部分，去掉ID和下划线
+            // 例如 LIGHT_LIVING_ON -> ON
+            if (cmd.length() > dev.id.length() + 1)
+            {
+                action = cmd.mid(dev.id.length() + 1);
+            }
+            break;
+        }
+    }
+
+    DatabaseManager::LogData log;
+    log.timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    log.user = "用户";
+    log.deviceName = deviceName;
+    log.action = action;
+    log.result = result;
+
+    DatabaseManager::instance().addLog(log);
 }
 
 void DeviceControlWidget::updateDeviceStatus(const QString &data)

@@ -58,6 +58,36 @@ public:
     };
     QList<DeviceData> getAllDevices();
 
+    // Log Management
+    struct LogData
+    {
+        int id;
+        QString timestamp;
+        QString user;
+        QString deviceName;
+        QString action;
+        QString result;
+    };
+    bool addLog(const LogData &log);
+    QList<LogData> getLogs(const QString &deviceType = "",
+                           const QString &startTime = "",
+                           const QString &endTime = "",
+                           const QString &actionType = "");
+    bool clearLogs();
+
+    // Environment Data Management
+    struct EnvData
+    {
+        int id;
+        QString timestamp;
+        double temperature;
+        double humidity;
+        double airQuality; // Placeholder if needed
+    };
+    bool addEnvData(double temp, double humidity);
+    QList<EnvData> getEnvData(const QString &startTime = "", const QString &endTime = "");
+    bool clearEnvData();
+
 private:
     explicit DatabaseManager(QObject *parent = nullptr);
     ~DatabaseManager();

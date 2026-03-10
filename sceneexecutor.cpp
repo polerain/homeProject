@@ -80,6 +80,23 @@ SceneExecutor::ExecutionResult SceneExecutor::execute(int sceneId)
         result.success = false;
     }
 
+    // 记录场景执行日志
+    DatabaseManager::LogData log;
+    log.timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    log.user = "用户"; // 假设是用户手动触发
+    log.deviceName = "场景: " + scene.name;
+    log.action = "执行场景";
+
+    if (result.success)
+    {
+        log.result = QString("成功 (执行%1个指令)").arg(result.successCount);
+    }
+    else
+    {
+        log.result = QString("失败 (成功%1/总%2): %3").arg(result.successCount).arg(result.totalCommands).arg(result.errorMessages.join("; "));
+    }
+    DatabaseManager::instance().addLog(log);
+
     return result;
 }
 
