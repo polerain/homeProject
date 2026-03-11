@@ -16,19 +16,8 @@ class SmartHomeSimulator:
         self.server_socket.listen(5)
         self.running = True
         
-        # Device states
-        self.devices = {
-            "light_living": "OFF",
-            "light_bedroom": "OFF",
-            "light_kitchen": "OFF",
-            "light_restroom": "OFF",
-            "light_dining": "OFF",
-            "fan_kitchen": "OFF",
-            "ac_living": "OFF",
-            "curtain_living": "0", # 0-100%
-            "temp_sensor": 25.0,
-            "humid_sensor": 60.0
-        }
+        # Device states (dynamic, will be created on first command)
+        self.devices = {}
         
         print(f"[*] Smart Home Device Simulator started on {HOST}:{PORT}")
 
@@ -66,11 +55,6 @@ class SmartHomeSimulator:
         if len(parts) < 2:
             return "ERROR_INVALID_CMD"
         
-        # Generic handling for simple ON/OFF devices
-        # Try to map command to device key
-        # e.g. LIGHT_LIVING_ON -> light_living = ON
-        # e.g. FAN_KITCHEN_OFF -> fan_kitchen = OFF
-        
         # Determine action (ON/OFF)
         action = parts[-1]
         if action in ["ON", "OFF"]:
@@ -78,9 +62,14 @@ class SmartHomeSimulator:
             # e.g. LIGHT_LIVING -> light_living
             device_key = "_".join(parts[:-1]).lower()
             
-            if device_key in self.devices:
+            # Dynamic device creation: if device doesn't exist, create it
+            if device_key not in self.devices:
                 self.devices[device_key] = action
+                print(f"[+] Dynamic device created: {device_key}")
                 return f"{cmd}_OK"
+            
+            self.devices[device_key] = action
+            return f"{cmd}_OK"
                 
         # Specific handling for special devices
         if cmd.startswith("AC_TEMP_"):
@@ -90,31 +79,99 @@ class SmartHomeSimulator:
                 return f"AC_TEMP_{temp}_OK"
             except:
                 return "ERROR_PARAM"
+        elif cmd.startswith("FAN_") and action in ["ON", "OFF"]:
+            # FAN_KITCHEN_ON
+            device_key = "_".join(parts[:-1]).lower()
+            if device_key not in self.devices:
+                self.devices[device_key] = action
+                print(f"[+] Dynamic device created: {device_key}")
+            return f"{cmd}_OK"
         elif "AC_" in cmd and "_TEMP_" in cmd:
             # AC_LIVING_TEMP_26
             try:
                 temp = parts[3]
+                device_key = "_".join(parts[1:3]).lower()
+                # Dynamic device creation for AC
+                if device_key not in self.devices:
+                    self.devices[device_key] = "OFF"
+                    print(f"[+] Dynamic device created: {device_key}")
                 return f"{cmd}_OK"
             except:
                 return "ERROR_PARAM"
         elif "AC_" in cmd and "_MODE_" in cmd:
             # AC_LIVING_MODE_COOL
-            return f"{cmd}_OK"
+            try:
+                device_key = "_".join(parts[1:3]).lower()
+                if device_key not in self.devices:
+                    self.devices[device_key] = "OFF"
+                    print(f"[+] Dynamic device created: {device_key}")
+                return f"{cmd}_OK"
+            except:
+                return "ERROR_PARAM"
         elif "AC_" in cmd and "_FAN_" in cmd:
             # AC_LIVING_FAN_AUTO
-            return f"{cmd}_OK"
+            try:
+                device_key = "_".join(parts[1:3]).lower()
+                if device_key not in self.devices:
+                    self.devices[device_key] = "OFF"
+                    print(f"[+] Dynamic device created: {device_key}")
+                return f"{cmd}_OK"
+            except:
+                return "ERROR_PARAM"
         elif "LIGHT_" in cmd and "_BRI_" in cmd:
             # LIGHT_LIVING_BRI_80
-            return f"{cmd}_OK"
+            try:
+                device_key = "_".join(parts[1:3]).lower()
+                if device_key not in self.devices:
+                    self.devices[device_key] = "OFF"
+                    print(f"[+] Dynamic device created: {device_key}")
+                return f"{cmd}_OK"
+            except:
+                return "ERROR_PARAM"
         elif "LIGHT_" in cmd and "_COLOR_" in cmd:
             # LIGHT_LIVING_COLOR_WARM
-            return f"{cmd}_OK"
+            try:
+                device_key = "_".join(parts[1:3]).lower()
+                if device_key not in self.devices:
+                    self.devices[device_key] = "OFF"
+                    print(f"[+] Dynamic device created: {device_key}")
+                return f"{cmd}_OK"
+            except:
+                return "ERROR_PARAM"
+        elif cmd.startswith("CURTAIN_") and len(parts) >= 3:
+            # Handle curtain position commands: CURTAIN_LIVING_100, CURTAIN_BEDROOM_50
+            try:
+                device_key = "_".join(parts[:-1]).lower()
+                position = parts[-1]
+                if position.isdigit():
+                    pos_val = int(position)
+                    if 0 <= pos_val <= 100:
+                        if device_key not in self.devices:
+                            self.devices[device_key] = "0"
+                            print(f"[+] Dynamic device created: {device_key}")
+                        self.devices[device_key] = position
+                        return f"{cmd}_OK"
+            except:
+                pass
         elif cmd == "CURTAIN_LIVING_TOGGLE":
             current_val = int(self.devices.get("curtain_living", "0"))
             # Toggle between 0 and 100
             new_val = "100" if current_val == 0 else "0"
             self.devices["curtain_living"] = new_val
             return f"CURTAIN_LIVING_{new_val}_OK"
+        elif cmd.startswith("CURTAIN_") and cmd.endswith("_TOGGLE"):
+            # Generic curtain toggle for any curtain device
+            # e.g., CURTAIN_BEDROOM_TOGGLE
+            parts = cmd.split('_')
+            if len(parts) >= 2:
+                curtain_id = "_".join(parts[1:-1]).lower()
+                if curtain_id not in self.devices:
+                    self.devices[curtain_id] = "0"
+                    print(f"[+] Dynamic device created: {curtain_id}")
+                current_val = int(self.devices.get(curtain_id, "0"))
+                new_val = "100" if current_val == 0 else "0"
+                self.devices[curtain_id] = new_val
+                return f"{cmd}_{new_val}_OK"
         elif cmd == "GET_ALL_STATUS":
             # Return JSON-like string or simple formatted string
             status = []
@@ -151,6 +208,12 @@ class SmartHomeSimulator:
     def send_sensor_data(self, client_socket):
         while self.running:
             try:
+                # Initialize sensor devices if not exists
+                if "temp_sensor" not in self.devices:
+                    self.devices["temp_sensor"] = 25.0
+                if "humid_sensor" not in self.devices:
+                    self.devices["humid_sensor"] = 60.0
+                
                 # Simulate environmental changes
                 self.devices["temp_sensor"] += random.uniform(-2.0, 2.0)
                 self.devices["humid_sensor"] += random.uniform(-5.0, 5.0)

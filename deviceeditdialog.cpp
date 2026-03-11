@@ -27,6 +27,15 @@ void DeviceEditDialog::setupUi()
     typeLayout->addWidget(m_typeCombo);
     mainLayout->addLayout(typeLayout);
 
+    // Curtain Position (only for CURTAIN type)
+    QHBoxLayout *curtainLayout = new QHBoxLayout();
+    curtainLayout->addWidget(new QLabel("初始闭合度(0-100):"));
+    m_curtainPositionSpin = new QSpinBox(this);
+    m_curtainPositionSpin->setRange(0, 100);
+    m_curtainPositionSpin->setValue(0);
+    curtainLayout->addWidget(m_curtainPositionSpin);
+    mainLayout->addLayout(curtainLayout);
+
     // Room
     QHBoxLayout *roomLayout = new QHBoxLayout();
     roomLayout->addWidget(new QLabel("所属房间:"));
@@ -72,6 +81,7 @@ DatabaseManager::DeviceData DeviceEditDialog::getDeviceData() const
     data.type = m_typeCombo->currentText();
     data.room = m_roomEdit->text().trimmed();
     data.deviceId = m_idEdit->text().trimmed();
+    data.status = m_curtainPositionSpin->value();
     // Keep original status/params or default
     return data;
 }

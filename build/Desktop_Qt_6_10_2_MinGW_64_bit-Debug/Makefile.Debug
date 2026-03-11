@@ -615,7 +615,8 @@ debug/moc_aiassistantwidget.cpp: ../../aiassistantwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QHBoxLayout \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QGroupBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgroupbox.h \
-		../../aiassistant.h \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QFrame \
+		../../weathermanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/QNetworkAccessManager \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/qtnetworkglobal.h \
@@ -661,7 +662,6 @@ debug/moc_aiassistantwidget.cpp: ../../aiassistantwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonArray \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/qjsonarray.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonDocument \
-		../../weathermanager.h \
 		debug/moc_predefs.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/bin/moc.exe
 	E:\QT\QT_INSTALL\6.10.2\mingw_64\bin\moc.exe $(DEFINES) --include E:/QT/qtProject/homeProject/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/debug/moc_predefs.h -IE:/QT/QT_INSTALL/6.10.2/mingw_64/mkspecs/win32-g++ -IE:/QT/qtProject/homeProject -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include/QtPrintSupport -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include/QtWidgets -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include/QtGui -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include/QtSql -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include/QtNetwork -IE:/QT/QT_INSTALL/6.10.2/mingw_64/include/QtCore -I. -IE:/QT/QT_INSTALL/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -IE:/QT/QT_INSTALL/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -IE:/QT/QT_INSTALL/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -IE:/QT/QT_INSTALL/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -IE:/QT/QT_INSTALL/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -IE:/QT/QT_INSTALL/Tools/mingw1310_64/x86_64-w64-mingw32/include ..\..\aiassistantwidget.h -o debug\moc_aiassistantwidget.cpp
@@ -1521,6 +1521,7 @@ debug/moc_devicecontrolwidget.cpp: ../../devicecontrolwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qspinbox.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QComboBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qcombobox.h \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QSlider \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QGroupBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgroupbox.h \
 		debug/moc_predefs.h \
@@ -1761,6 +1762,8 @@ debug/moc_deviceeditdialog.cpp: ../../deviceeditdialog.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qlayoutitem.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgridlayout.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QHBoxLayout \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QSpinBox \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qspinbox.h \
 		../../databasemanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/QSqlDatabase \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/qsqldatabase.h \
@@ -5302,7 +5305,8 @@ debug/aiassistantwidget.o: ../../aiassistantwidget.cpp ../../aiassistantwidget.h
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QHBoxLayout \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QGroupBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgroupbox.h \
-		../../aiassistant.h \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QFrame \
+		../../weathermanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/QNetworkAccessManager \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/qtnetworkglobal.h \
@@ -5348,7 +5352,6 @@ debug/aiassistantwidget.o: ../../aiassistantwidget.cpp ../../aiassistantwidget.h
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonArray \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/qjsonarray.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonDocument \
-		../../weathermanager.h \
 		../../databasemanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/QSqlDatabase \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/qsqldatabase.h \
@@ -5876,6 +5879,7 @@ debug/dashboardwidget.o: ../../dashboardwidget.cpp ../../dashboardwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qspinbox.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QComboBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qcombobox.h \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QSlider \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QGroupBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgroupbox.h \
 		../../scenewidget.h \
@@ -6253,7 +6257,8 @@ debug/dashboardwidget.o: ../../dashboardwidget.cpp ../../dashboardwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/qsqlerror.h \
 		../../aiassistantwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QTextEdit \
-		../../aiassistant.h \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QFrame \
+		../../weathermanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/QNetworkAccessManager \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtNetwork/qtnetworkglobal.h \
@@ -6281,7 +6286,6 @@ debug/dashboardwidget.o: ../../dashboardwidget.cpp ../../dashboardwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonObject \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonArray \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtCore/QJsonDocument \
-		../../weathermanager.h \
 		../../alarmwidget.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QDoubleSpinBox \
 		../../tcpmanager.h \
@@ -6697,6 +6701,7 @@ debug/devicecontrolwidget.o: ../../devicecontrolwidget.cpp ../../devicecontrolwi
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qspinbox.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QComboBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qcombobox.h \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QSlider \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QGroupBox \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgroupbox.h \
 		../../tcpmanager.h \
@@ -6968,6 +6973,8 @@ debug/deviceeditdialog.o: ../../deviceeditdialog.cpp ../../deviceeditdialog.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qlayoutitem.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qgridlayout.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QHBoxLayout \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/QSpinBox \
+		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtWidgets/qspinbox.h \
 		../../databasemanager.h \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/QSqlDatabase \
 		../../../../QT_INSTALL/6.10.2/mingw_64/include/QtSql/qsqldatabase.h \

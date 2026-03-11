@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QSpinBox>
 #include "databasemanager.h"
 
 class DeviceEditDialog : public QDialog
@@ -27,6 +28,7 @@ private:
 
     QLineEdit *m_nameEdit;
     QComboBox *m_typeCombo;
+    QSpinBox *m_curtainPositionSpin;
     QLineEdit *m_roomEdit;
     QLineEdit *m_idEdit;
     QPushButton *m_btnSave;

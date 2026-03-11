@@ -159,9 +159,43 @@ DeviceItemWidget::DeviceItemWidget(const QString &name, const QString &type, con
     else if (type == "CURTAIN")
     {
         m_iconLabel->setText("🪟");
-        m_controlBtn->setText("开/关窗帘");
+        m_controlBtn->setText("操作窗帘");
+
+        // --- Curtain Extended Controls ---
+        m_curtainControlWidget = new QWidget(this);
+        QHBoxLayout *curtainLayout = new QHBoxLayout(m_curtainControlWidget);
+        curtainLayout->setContentsMargins(0, 0, 0, 0);
+        curtainLayout->setSpacing(5);
+
+        // Curtain Position Slider
+        QLabel *posLabel = new QLabel("闭合度:", this);
+        m_curtainSlider = new QSlider(Qt::Horizontal, this);
+        m_curtainSlider->setRange(0, 100);
+        m_curtainSlider->setValue(0);
+        m_curtainSlider->setMinimumWidth(150);
+        m_curtainSlider->setMaximumWidth(200);
+        m_curtainSlider->setTickPosition(QSlider::TicksBelow);
+        m_curtainSlider->setTickInterval(10);
+        m_curtainSlider->setStyleSheet("QSlider::handle:horizontal { background: #4CAF50; border: 1px solid #4CAF50; width: 18px; margin: -8px 0; border-radius: 9px; } QSlider::sub-page:horizontal { background: #4CAF50; border-radius: 4px; } QSlider::add-page:horizontal { background: #ccc; border-radius: 4px; }");
+        connect(m_curtainSlider, &QSlider::valueChanged, [this](int val)
+                { emit controlClicked(QString("%1_%2").arg(m_id.toUpper()).arg(val)); });
+
+        QLabel *posValueLabel = new QLabel("0%", this);
+        posValueLabel->setMinimumWidth(40);
+        connect(m_curtainSlider, &QSlider::valueChanged, [posValueLabel](int val)
+                { posValueLabel->setText(QString("%1%").arg(val)); });
+
+        curtainLayout->addWidget(posLabel);
+        curtainLayout->addWidget(m_curtainSlider);
+        curtainLayout->addWidget(posValueLabel);
+
+        infoLayout->addWidget(m_curtainControlWidget);
+
         connect(m_controlBtn, &QPushButton::clicked, [this]()
-                { emit controlClicked(QString("%1_TOGGLE").arg(m_id.toUpper())); });
+                {
+            int currentVal = m_curtainSlider->value();
+            QString cmd = (currentVal == 0) ? "100" : "0";
+            emit controlClicked(QString("%1_%2").arg(m_id.toUpper()).arg(cmd)); });
     }
     else if (type == "FAN")
     {
@@ -190,18 +224,42 @@ void DeviceItemWidget::setStatus(const QString &status)
     m_statusLabel->setText(status);
     bool isActive = (status == "ON" || status == "OPEN" || status == "100");
 
+    if (m_type == "CURTAIN")
+    {
+        bool ok = false;
+        int val = status.toInt(&ok);
+        if (ok && val > 0)
+        {
+            isActive = true;
+        }
+    }
+
     m_iconLabel->setProperty("active", isActive);
     style()->unpolish(m_iconLabel);
     style()->polish(m_iconLabel);
 
-    if (isActive) // 100 means open for curtain
+    if (isActive)
     {
         if (m_type == "LIGHT")
             m_controlBtn->setText("关闭");
         if (m_type == "AC")
             m_controlBtn->setText("关闭空调");
         if (m_type == "CURTAIN")
+        {
             m_controlBtn->setText("关闭窗帘");
+            if (m_curtainSlider)
+            {
+                bool ok = false;
+                int val = status.toInt(&ok);
+                if (ok)
+                {
+                    m_curtainSlider->setValue(val);
+                    m_statusLabel->setText(QString("闭合度: %1%").arg(val));
+                }
+            }
+        }
+        if (m_type == "FAN")
+            m_controlBtn->setText("关闭");
     }
     else
     {
@@ -210,7 +268,21 @@ void DeviceItemWidget::setStatus(const QString &status)
         if (m_type == "AC")
             m_controlBtn->setText("开启空调");
         if (m_type == "CURTAIN")
+        {
             m_controlBtn->setText("开启窗帘");
+            if (m_curtainSlider)
+            {
+                bool ok = false;
+                int val = status.toInt(&ok);
+                if (ok)
+                {
+                    m_curtainSlider->setValue(val);
+                    m_statusLabel->setText(QString("闭合度: %1%").arg(val));
+                }
+            }
+        }
+        if (m_type == "FAN")
+            m_controlBtn->setText("开启");
     }
 }
 
@@ -315,7 +387,14 @@ void DeviceControlWidget::loadDevices()
         info.type = dbDev.type;
         info.room = dbDev.room;
         info.id = dbDev.deviceId;
-        info.status = (dbDev.status == 1 ? "ON" : "OFF"); // Simple mapping
+        if (dbDev.type == "CURTAIN")
+        {
+            info.status = QString::number(dbDev.status);
+        }
+        else
+        {
+            info.status = (dbDev.status == 1 ? "ON" : "OFF");
+        }
         m_allDevices.append(info);
     }
 
@@ -325,7 +404,7 @@ void DeviceControlWidget::loadDevices()
         m_allDevices = {
             {"客厅主灯", "LIGHT", "OFF", "light_living", "客厅"},
             {"客厅空调", "AC", "OFF", "ac_living", "客厅"},
-            {"客厅窗帘", "CURTAIN", "CLOSED", "curtain_living", "客厅"},
+            {"客厅窗帘", "CURTAIN", "0", "curtain_living", "客厅"},
             {"卧室顶灯", "LIGHT", "OFF", "light_bedroom", "卧室"},
             {"厨房顶灯", "LIGHT", "OFF", "light_kitchen", "厨房"},
             {"排气扇", "FAN", "OFF", "fan_kitchen", "厨房"},
@@ -340,7 +419,16 @@ void DeviceControlWidget::loadDevices()
             d.type = info.type;
             d.room = info.room;
             d.deviceId = info.id;
-            d.status = (info.status == "ON" ? 1 : 0);
+            if (info.type == "CURTAIN")
+            {
+                bool ok = false;
+                int status = info.status.toInt(&ok);
+                d.status = ok ? status : 0;
+            }
+            else
+            {
+                d.status = (info.status == "ON" ? 1 : 0);
+            }
             DatabaseManager::instance().addDevice(d);
         }
     }
@@ -477,9 +565,9 @@ void DeviceControlWidget::filterDevices(const QString &room)
         QListWidgetItem *item = new QListWidgetItem(m_deviceList);
 
         // Adjust height based on type
-        if (dev.type == "AC" || dev.type == "LIGHT")
+        if (dev.type == "AC" || dev.type == "LIGHT" || dev.type == "CURTAIN")
         {
-            item->setSizeHint(QSize(0, 120)); // Taller for AC and LIGHT
+            item->setSizeHint(QSize(0, 120)); // Taller for AC, LIGHT and CURTAIN
         }
         else
         {

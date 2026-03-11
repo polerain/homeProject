@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QSlider>
 #include <QGroupBox>
 
 // Custom Widget for List Item
@@ -42,6 +43,10 @@ private:
     QWidget *m_lightControlWidget;
     QSpinBox *m_brightnessSpinBox; // 0-100%
     QComboBox *m_colorTempCombo;   // Warm, Neutral, Cold
+    
+    // Curtain Specific Controls
+    QWidget *m_curtainControlWidget;
+    QSlider *m_curtainSlider;
     
     QString m_name; // Display Name (e.g. 客厅灯)
     QString m_id;   // Internal ID (e.g. light_living)
