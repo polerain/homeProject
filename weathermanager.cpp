@@ -13,7 +13,7 @@
 WeatherManager::WeatherManager(QObject *parent) : QObject(parent)
 {
     m_networkManager = new QNetworkAccessManager(this);
-    m_apiKey = "cztei_hBylFnLT8Q7zpEbheGZhaR3ZDYtKZtOxDS8X2vklkkSPt5966aH3koS7fULqN1zTl";
+    m_apiKey = "sat_2d2mDR2zVEq85XNBUzHLGjehVcZJF8d3Fa41I1BCMR2pFnoTI27s1Ojt5dutR9qa";
 }
 
 WeatherManager::~WeatherManager()
